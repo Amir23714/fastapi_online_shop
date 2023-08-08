@@ -1,5 +1,4 @@
 from models.models import User as user_model
-from sqlalchemy.orm import Session
 from DTO.User import User as user_dto
 
 
@@ -8,9 +7,6 @@ def create_user(data: user_dto, db):
 
     try:
         db.add(user)
-        db.commit()
-        db.refresh(user)
-
     except Exception as e:
         print(e)
 
@@ -23,19 +19,21 @@ def get_user(email: str, db):
 
 def make_user_logged_in(user: user_model, db):
     user.isLoggedIn = True
-    db.commit()
-    db.refresh(user)
     return user
+
 
 def make_user_unlogged_in(user: user_model, db):
     user.isLoggedIn = False
-    db.commit()
-    db.refresh(user)
+
     return user
 
 
 def change_password(user: user_model, new_password: str, db):
     user.password = new_password
+
+    return user
+
+def set_cart_id(user: user_model, cart_id : int, db):
+    user.cart_id = cart_id
     db.commit()
-    db.refresh(user)
     return user

@@ -27,7 +27,7 @@ class AuthHandler():
 
         access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES_MINUTES)
         now = datetime.datetime.now()
-        print(now)
+
         token_expires = now + access_token_expires
 
         data["exp"] = int(token_expires.timestamp())
@@ -38,7 +38,6 @@ class AuthHandler():
 
     def decode_token(self, token: str, db):
         try:
-            print(token)
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
 
             return payload
@@ -49,8 +48,11 @@ class AuthHandler():
             }
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM,
                                  options=custom_options)
+
             UserServices.make_user_unlogged_in(UserServices.get_user(payload.get("sub"), db), db)
-            raise HTTPException(status_code=400, detail="Your token has been expired")
+            db.commit()
+
+            raise HTTPException(status_code=401, detail="Your token has been expired")
 
     def authentificate_admin(self, access_token, db):
         from services import User as UserServices
@@ -60,9 +62,6 @@ class AuthHandler():
         email = payload.get("sub")
         isAdmin = payload.get("isAdmin")
         exp = payload.get("exp")
-
-        if exp < (datetime.datetime.utcnow().timestamp()):
-            raise HTTPException(status_code=400, detail="Your access token is expired")
 
         user = UserServices.get_user(email, db)
 
@@ -79,9 +78,6 @@ class AuthHandler():
         email = payload.get("sub")
         isAdmin = payload.get("isAdmin")
         exp = payload.get("exp")
-
-        if exp < (datetime.datetime.utcnow().timestamp()):
-            raise HTTPException(status_code=400, detail="Your access token is expired")
 
         user = UserServices.get_user(email, db)
 

@@ -6,13 +6,12 @@ from DTO.User import User as user_dto
 from fastapi import HTTPException
 
 
-def create_cart(user: user_dto, db):
-    cart = cart_model(items="{}", total_price=0, user_id=user.id)
+def create_cart(user_id: int, db):
+    cart = cart_model(items="{}", total_price=0, user_id=user_id)
 
     try:
         db.add(cart)
-        db.commit()
-        db.refresh(cart)
+
 
     except Exception as e:
         print(e)
@@ -46,9 +45,6 @@ def add_item(user: user_dto, product_id: int, amount: int, db) -> cart_model:
 
     cart.total_price += product.price * amount
 
-    db.commit()
-    db.refresh(cart)
-
     return cart
 
 
@@ -76,8 +72,6 @@ def remove_item(user: user_dto, product_id: int, amount: int, db):
         if cart.total_price < 0:
             cart.total_price = 0
 
-        db.commit()
-        db.refresh(cart)
         return cart
 
     # Product is not in the user's cart

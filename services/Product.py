@@ -13,8 +13,7 @@ def create_product(data: product_dto, db):
 
     try:
         db.add(product)
-        db.commit()
-        db.refresh(product)
+
 
     except Exception as e:
         print(e)
@@ -26,7 +25,7 @@ def get_product(id: int, db):
     product = db.query(product_model).filter(product_model.id == id).first()
     if product is None:
         raise HTTPException(status_code=400, detail="No such product id in the product list")
-    return db.query(product_model).filter(product_model.id == id).first()
+    return product
 
 
 def get_all_products(db):
@@ -41,31 +40,23 @@ def update_price(id: int, price: int, db):
     product = get_product(id, db)
     product.price = price
 
-    db.commit()
-    db.refresh(product)
-
     return product
 
 
 def update_amount(id: int, amount: int, db):
     product = get_product(id, db)
     product.amount = amount
-
-    db.commit()
-
+    return product
 
 def delete_product(id: int, db):
     product = get_product(id, db)
     db.delete(product)
-    db.commit()
+    return product
 
 
 def update_description(id: int, description: str, db):
     product = get_product(id, db)
     product.description = description
-
-    db.commit()
-    db.refresh(product)
 
     return product
 
@@ -73,8 +64,5 @@ def update_description(id: int, description: str, db):
 def update_visibility(id: int, isVisible: bool, db):
     product = get_product(id, db)
     product.isVisible = isVisible
-
-    db.commit()
-    db.refresh(product)
 
     return product
