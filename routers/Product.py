@@ -1,6 +1,5 @@
 from typing import Annotated, List, Dict
 
-from fastapi_cache.decorator import cache
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
